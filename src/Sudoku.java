@@ -8,6 +8,7 @@ import javax.swing.JButton;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -22,8 +23,8 @@ public class Sudoku {
 
 	private JFrame frmSudoku;
 	private JTextField[][][][] boxes = new JTextField[3][3][3][3];
-	private int[][][][] clues = {{{{9, 6, 0}, {0, 0, 0}, {4, 0, 0}}, {{3, 0, 0}, {0, 2, 0}, {0, 0, 0}}, {{8, 0, 1}, {3, 0, 0}, {0, 0, 0}}}, {{{5, 0, 0}, {0, 0, 9}, {0, 0, 0}}, {{0, 0, 0}, {0, 0, 4}, {6, 8, 0}}, {{0, 2, 7}, {0, 0, 0}, {0, 0, 0}}}, {{{0, 0, 0}, {0, 5, 0}, {0, 0, 0}}, {{1, 6, 2}, {4, 0, 0}, {0, 0, 0}}, {{0, 9, 8}, {1, 0, 0}, {0, 0, 0}}}};
-		//{{{{5, 3, 0}, {6, 0, 0}, {0, 9, 8}}, {{0, 7, 0}, {1, 9, 5}, {0, 0, 0}}, {{0, 0, 0}, {0, 0, 0}, {0, 6, 0}}}, {{{8, 0, 0}, {4, 0, 0}, {7, 0, 0}}, {{0, 6, 0}, {8, 0, 3}, {0, 2, 0}}, {{0, 0, 3}, {0, 0, 1}, {0, 0, 6}}}, {{{0, 6, 0}, {0, 0, 0}, {0, 0, 0}}, {{0, 0, 0}, {4, 1, 9}, {0, 8, 0}}, {{2, 8, 0}, {0, 0, 5}, {0, 7, 9}}}};
+	private int[][][][] clues = {{{{5, 3, 0}, {6, 0, 0}, {0, 9, 8}}, {{0, 7, 0}, {1, 9, 5}, {0, 0, 0}}, {{0, 0, 0}, {0, 0, 0}, {0, 6, 0}}}, {{{8, 0, 0}, {4, 0, 0}, {7, 0, 0}}, {{0, 6, 0}, {8, 0, 3}, {0, 2, 0}}, {{0, 0, 3}, {0, 0, 1}, {0, 0, 6}}}, {{{0, 6, 0}, {0, 0, 0}, {0, 0, 0}}, {{0, 0, 0}, {4, 1, 9}, {0, 8, 0}}, {{2, 8, 0}, {0, 0, 5}, {0, 7, 9}}}};
+	//{{{{9, 6, 0}, {0, 0, 0}, {4, 0, 0}}, {{3, 0, 0}, {0, 2, 0}, {0, 0, 0}}, {{8, 0, 1}, {3, 0, 0}, {0, 0, 0}}}, {{{5, 0, 0}, {0, 0, 9}, {0, 0, 0}}, {{0, 0, 0}, {0, 0, 4}, {6, 8, 0}}, {{0, 2, 7}, {0, 0, 0}, {0, 0, 0}}}, {{{0, 0, 0}, {0, 5, 0}, {0, 0, 0}}, {{1, 6, 2}, {4, 0, 0}, {0, 0, 0}}, {{0, 9, 8}, {1, 0, 0}, {0, 0, 0}}}};
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -60,10 +61,29 @@ public class Sudoku {
 		JButton checkButton = new JButton("Check");
 		springLayout.putConstraint(SpringLayout.WEST, checkButton, 126, SpringLayout.WEST, frmSudoku.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, checkButton, -5, SpringLayout.SOUTH, frmSudoku.getContentPane());
+		checkButton.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+			    try {
+			    	int[][][][] solution = solvePuzzle(clues);
+			    	if(solution != null) {
+			    		showCheck(solution);
+			    	}else {
+			    		System.out.println("No Solution");
+			    	}
+			    	
+			    	
+			    }catch (Exception err) {
+			    	System.out.println(err);
+			    }
+		    	
+		    }
+		});
 		frmSudoku.getContentPane().add(checkButton);
 		
 		JButton solveButton = new JButton("Solve");
-		springLayout.putConstraint(SpringLayout.WEST, solveButton, 40, SpringLayout.EAST, checkButton);
+		springLayout.putConstraint(SpringLayout.WEST, solveButton, 163, SpringLayout.EAST, checkButton);
 		springLayout.putConstraint(SpringLayout.SOUTH, solveButton, 0, SpringLayout.SOUTH, checkButton);
 		solveButton.addActionListener(new ActionListener() {
 
@@ -84,9 +104,9 @@ public class Sudoku {
 		
 		JPanel outer = new JPanel();
 		springLayout.putConstraint(SpringLayout.NORTH, outer, -332, SpringLayout.NORTH, checkButton);
-		springLayout.putConstraint(SpringLayout.WEST, outer, 77, SpringLayout.WEST, frmSudoku.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, outer, 37, SpringLayout.WEST, frmSudoku.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, outer, -6, SpringLayout.NORTH, checkButton);
-		springLayout.putConstraint(SpringLayout.EAST, outer, 538, SpringLayout.WEST, frmSudoku.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, outer, 518, SpringLayout.WEST, frmSudoku.getContentPane());
 		frmSudoku.getContentPane().add(outer);
 		outer.setLayout(new GridLayout(3, 3, 0, 0));
 		outer.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -94,8 +114,9 @@ public class Sudoku {
 		
 		
 		JButton setClues = new JButton("Set Clues");
+		setClues.setPreferredSize(new Dimension(110, 30));
 		springLayout.putConstraint(SpringLayout.NORTH, setClues, 41, SpringLayout.NORTH, frmSudoku.getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, setClues, 6, SpringLayout.EAST, outer);
+		springLayout.putConstraint(SpringLayout.WEST, setClues, 4, SpringLayout.EAST, outer);
 		setClues.addActionListener(new ActionListener() {
 
 		    @Override
@@ -119,6 +140,33 @@ public class Sudoku {
 		    }
 		});
 		frmSudoku.getContentPane().add(setClues);
+		
+		
+		JButton clearBoard = new JButton("Clear Board");
+		clearBoard.setPreferredSize(new Dimension(110, 30));
+		springLayout.putConstraint(SpringLayout.NORTH, clearBoard, 82, SpringLayout.NORTH, frmSudoku.getContentPane());
+		springLayout.putConstraint(SpringLayout.WEST, clearBoard, 4, SpringLayout.EAST, outer);
+		clearBoard.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		    	int[][][][] newClues = new int[3][3][3][3];
+				for(int i=0; i<3; i++) {
+					for(int j=0; j<3; j++) {
+						for(int x=0; x<3; x++) {
+							for(int y=0; y<3; y++) {
+								
+								newClues[i][j][x][y] = 0;
+								
+							}
+						}
+					}
+				}
+				updateClues(newClues);
+		    }
+		});
+		frmSudoku.getContentPane().add(clearBoard);
+		
 		Font font1 = new Font("SansSerif", Font.BOLD, 20);
 		for(int i=0; i<3; i++) {
 			for(int j=0; j<3; j++) {
@@ -216,6 +264,23 @@ public class Sudoku {
 							box.setText(String.valueOf(solution[i][j][x][y]));
 						} catch (Exception ere) {
 						}
+					}
+				}
+			}
+		}
+	}
+	
+	public void showCheck(int[][][][] solution) {
+		System.out.println(Arrays.deepToString(solution));
+		for(int i=0; i<3; i++) {
+			for(int j=0; j<3; j++) {
+				for(int x=0; x<3; x++) {
+					for(int y=0; y<3; y++) {
+						JTextField box = boxes[i][j][x][y];
+						if (!box.getText().equals(String.valueOf(solution[i][j][x][y]))) {
+							box.setText("");
+						}
+						
 					}
 				}
 			}
